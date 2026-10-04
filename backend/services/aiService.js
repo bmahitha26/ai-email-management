@@ -1,14 +1,18 @@
-import OpenAI from "openai";
+import { GoogleGenAI } from "@google/genai";
 import "dotenv/config";
 
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY
+const ai = new GoogleGenAI({
+  apiKey: process.env.GEMINI_API_KEY
 });
 
+// --------------------------------------------------
+// AI EMAIL OVERVIEW
+// --------------------------------------------------
+
 export const generateEmailOverview = async (subject, body) => {
-  const response = await openai.responses.create({
-    model: "gpt-5.6-luna",
-    input: `
+  const response = await ai.models.generateContent({
+    model: "gemini-2.5-flash-lite",
+    contents: `
 You are an AI email assistant.
 
 Summarize the following email in 1-3 short sentences.
@@ -28,17 +32,17 @@ ${body}
 `
   });
 
-  return response.output_text;
+  return response.text;
 };
+
 // --------------------------------------------------
 // AI EMAIL WRITER
 // --------------------------------------------------
 
 export const generateEmailDraft = async (prompt, tone) => {
-  const response = await openai.responses.create({
-    model: "gpt-5.6-luna",
-
-    input: `
+  const response = await ai.models.generateContent({
+    model: "gemini-2.5-flash-lite",
+    contents: `
 You are a professional AI email writing assistant.
 
 Create a complete email based on the user's request.
@@ -71,7 +75,7 @@ BODY:
 `
   });
 
-  const output = response.output_text;
+  const output = response.text;
 
   const subjectMatch = output.match(
     /SUBJECT:\s*([\s\S]*?)\s*BODY:/

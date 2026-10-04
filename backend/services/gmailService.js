@@ -3,16 +3,13 @@ import { execFile } from "child_process";
 import { promisify } from "util";
 import path from "path";
 import { fileURLToPath } from "url";
-import OpenAI from "openai";
 
 const execFileAsync = promisify(execFile);
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY
-});
+
 
 
 // =====================================================
@@ -314,53 +311,6 @@ export async function getGmailMessages(
   );
 
   return emailList;
-}
-
-
-// =====================================================
-// AI EMAIL OVERVIEW
-// =====================================================
-
-export async function generateEmailOverview(
-  subject,
-  body
-) {
-  try {
-    const response =
-      await openai.chat.completions.create({
-        model: "gpt-4o-mini",
-
-        messages: [
-          {
-            role: "system",
-            content:
-              "Summarize emails clearly and briefly. Give the main purpose, important details, and any required action. Do not add information that is not present in the email."
-          },
-          {
-            role: "user",
-            content: `Subject: ${subject || ""}
-
-Email:
-${body || ""}`
-          }
-        ],
-
-        temperature: 0.3
-      });
-
-    return response
-      .choices[0]
-      .message
-      .content;
-
-  } catch (error) {
-    console.error(
-      "AI Overview generation error:",
-      error
-    );
-
-    throw error;
-  }
 }
 // =====================================================
 // STAR / UNSTAR EMAIL
